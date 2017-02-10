@@ -1,0 +1,40 @@
+{
+  "name": "plop-acceptance-test-steps",
+  "version": "0.0.1",
+  "description": "A few useful plops",
+  "main": "build/index.js",
+  "engines": {
+    "node": ">=4.8.4"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "BABEL_ENV=production ./node_modules/.bin/babel src -d build --copy-files",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thiagodelgado111/plop-acceptance-test-steps.git"
+  },
+  "author": "Thiago Delgado",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thiagodelgado111/plop-acceptance-test-steps/issues"
+  },
+  "homepage": "https://github.com/thiagodelgado111/plop-acceptance-test-steps#readme",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "eslint": "^4.2.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-import": "^2.7.0"
+  },
+  "dependencies": {
+    "inquirer-directory": "^2.1.0"
+  }
+}

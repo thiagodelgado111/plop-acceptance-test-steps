@@ -1,0 +1,17 @@
+{
+  "extends": ["airbnb-base"],
+  "parser": "babel-eslint",
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "allowImportExportEverywhere": true,
+  },
+  "rules": {
+   "arrow-parens": [2, "as-needed"],
+   "import/prefer-default-export": [1]
+  }
+}
