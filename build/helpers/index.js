@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.parseScenarioFilenameHelper = exports.parseArgsNumberHelper = exports.parseScenarioTextHelper = undefined;
+exports.parseScenarioFilenameHelper = exports.parseScenarioTextHelper = exports.parseArgsNumberHelper = undefined;
 
 var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
 
@@ -44,8 +44,21 @@ var replaceWhitespaces = function replaceWhitespaces(template) {
   return scenarioTemplate;
 };
 
-var parseScenarioTextHelper = exports.parseScenarioTextHelper = function parseScenarioTextHelper(template) {
-  return template.split(' ').reduce(function (prev, current) {
+var parseArgsNumberHelper = exports.parseArgsNumberHelper = function parseArgsNumberHelper(template) {
+  var numbers = template.match(/^(?=[^.])[0-9]+$/gi) || [];
+  var decimals = template.match(/(\d+(?:\.\d*)?)/gi) || [];
+  var text = template.match(/"([^(\s+|"|(\d+))]*)"/g) || [];
+  var options = template.match(/\[(.*)\]/gi) || [];
+  return [].concat((0, _toConsumableArray3.default)(numbers), (0, _toConsumableArray3.default)(decimals), (0, _toConsumableArray3.default)(text), (0, _toConsumableArray3.default)(options)).map(function (item, idx) {
+    return `arg${idx + 1}`;
+  }).join(', ');
+};
+
+var parseScenarioTextHelper = exports.parseScenarioTextHelper = function parseScenarioTextHelper(template, type) {
+  var scenarioTemplate = template && template.trim();
+  scenarioTemplate = scenarioTemplate.toUpperCase().startsWith(`${type.toUpperCase()} `) ? scenarioTemplate.substring(`${type} `.length, scenarioTemplate.length) : scenarioTemplate;
+
+  return scenarioTemplate.split(' ').reduce(function (prev, current) {
     var acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
     if (acceptsIntegerNumbers) {
       return `${prev} (\\d+)`;
@@ -71,26 +84,16 @@ var parseScenarioTextHelper = exports.parseScenarioTextHelper = function parseSc
     }
 
     return `${prev} ${current}`;
-  }, '');
-};
-
-var parseArgsNumberHelper = exports.parseArgsNumberHelper = function parseArgsNumberHelper(template) {
-  var numbers = template.match(/^(?=[^.])[0-9]+$/gi) || [];
-  var decimals = template.match(/(\d+(?:\.\d*)?)/gi) || [];
-  var text = template.match(/"([^(\s+|"|(\d+))]*)"/g) || [];
-  var options = template.match(/\[(.*)\]/gi) || [];
-  return [].concat((0, _toConsumableArray3.default)(numbers), (0, _toConsumableArray3.default)(decimals), (0, _toConsumableArray3.default)(text), (0, _toConsumableArray3.default)(options)).map(function (item, idx) {
-    return `arg${idx + 1}`;
-  }).join(', ');
+  }, '').trim();
 };
 
 var parseScenarioFilenameHelper = exports.parseScenarioFilenameHelper = function parseScenarioFilenameHelper(template, type) {
   var scenarioTemplate = template && template.trim();
-  scenarioTemplate = scenarioTemplate.startsWith(`${type} `) ? scenarioTemplate.substring(`${type} `.length, scenarioTemplate.length) : scenarioTemplate;
+  scenarioTemplate = scenarioTemplate.toUpperCase().startsWith(`${type.toUpperCase()} `) ? scenarioTemplate.substring(`${type} `.length, scenarioTemplate.length) : scenarioTemplate;
 
   scenarioTemplate = replaceKeyword(scenarioTemplate);
   scenarioTemplate = replaceDecimals(scenarioTemplate);
   scenarioTemplate = replaceNumbers(scenarioTemplate);
   scenarioTemplate = replaceWhitespaces(scenarioTemplate);
-  return scenarioTemplate;
+  return scenarioTemplate && scenarioTemplate.trim();
 };

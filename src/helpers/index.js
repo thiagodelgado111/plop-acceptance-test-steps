@@ -31,33 +31,6 @@ const replaceWhitespaces = template => {
   return scenarioTemplate;
 };
 
-export const parseScenarioTextHelper = template => template.split(' ').reduce((prev, current) => {
-  const acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
-  if (acceptsIntegerNumbers) {
-    return `${prev} (\\d+)`;
-  }
-
-  const acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
-  if (acceptsDecimalNumbers) {
-    return `${prev} (\\d+(?:\\.\\d*)?)`;
-  }
-
-  const acceptMultipleChoices = /\[(.*)\]/gi.test(current);
-  if (acceptMultipleChoices) {
-    const choices = current.match(/\[(.*)\]/gi);
-    const formattedChoices = choices
-      .reduce((options, option) => options.replace(/\[(.*)\]/gi, `"(${option}*)"`), current);
-    return `${prev} ${formattedChoices}`;
-  }
-
-  const acceptsText = /"([^(\s+|"|(\d+))]*)"/g.test(current);
-  if (acceptsText) {
-    return `${prev} "([^"]*)"`;
-  }
-
-  return `${prev} ${current}`;
-}, '');
-
 export const parseArgsNumberHelper = template => {
   const numbers = template.match(/^(?=[^.])[0-9]+$/gi) || [];
   const decimals = template.match(/(\d+(?:\.\d*)?)/gi) || [];
@@ -66,9 +39,43 @@ export const parseArgsNumberHelper = template => {
   return [...numbers, ...decimals, ...text, ...options].map((item, idx) => `arg${idx + 1}`).join(', ');
 };
 
+export const parseScenarioTextHelper = (template, type) => {
+  let scenarioTemplate = template && template.trim();
+  scenarioTemplate = scenarioTemplate.toUpperCase().startsWith(`${type.toUpperCase()} `) ?
+    scenarioTemplate.substring(`${type} `.length, scenarioTemplate.length) :
+    scenarioTemplate;
+
+  return scenarioTemplate.split(' ').reduce((prev, current) => {
+    const acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
+    if (acceptsIntegerNumbers) {
+      return `${prev} (\\d+)`;
+    }
+
+    const acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
+    if (acceptsDecimalNumbers) {
+      return `${prev} (\\d+(?:\\.\\d*)?)`;
+    }
+
+    const acceptMultipleChoices = /\[(.*)\]/gi.test(current);
+    if (acceptMultipleChoices) {
+      const choices = current.match(/\[(.*)\]/gi);
+      const formattedChoices = choices
+        .reduce((options, option) => options.replace(/\[(.*)\]/gi, `"(${option}*)"`), current);
+      return `${prev} ${formattedChoices}`;
+    }
+
+    const acceptsText = /"([^(\s+|"|(\d+))]*)"/g.test(current);
+    if (acceptsText) {
+      return `${prev} "([^"]*)"`;
+    }
+
+    return `${prev} ${current}`;
+  }, '').trim();
+};
+
 export const parseScenarioFilenameHelper = (template, type) => {
   let scenarioTemplate = template && template.trim();
-  scenarioTemplate = scenarioTemplate.startsWith(`${type} `) ?
+  scenarioTemplate = scenarioTemplate.toUpperCase().startsWith(`${type.toUpperCase()} `) ?
     scenarioTemplate.substring(`${type} `.length, scenarioTemplate.length) :
     scenarioTemplate;
 
@@ -76,5 +83,5 @@ export const parseScenarioFilenameHelper = (template, type) => {
   scenarioTemplate = replaceDecimals(scenarioTemplate);
   scenarioTemplate = replaceNumbers(scenarioTemplate);
   scenarioTemplate = replaceWhitespaces(scenarioTemplate);
-  return scenarioTemplate;
+  return scenarioTemplate && scenarioTemplate.trim();
 };
