@@ -18,9 +18,9 @@ var replaceKeyword = function replaceKeyword(template) {
   }
 
   // eslint-disable-next-line no-useless-escape
-  if (/\[([a-zA-Z\|]+)]/g.test(scenarioTemplate)) {
+  if (/\[([\sa-zA-Z\|]+)]/g.test(scenarioTemplate)) {
     // eslint-disable-next-line no-useless-escape
-    scenarioTemplate = scenarioTemplate.replace(/\[([a-zA-Z\|]+)]/g, '#');
+    scenarioTemplate = scenarioTemplate.replace(/\[([\sa-zA-Z\|]+)]/g, '#');
   }
 
   return scenarioTemplate;
@@ -47,7 +47,7 @@ var replaceWhitespaces = function replaceWhitespaces(template) {
 var parseArgsNumberHelper = exports.parseArgsNumberHelper = function parseArgsNumberHelper(template) {
   var numbers = template.match(/^(?=[^.])[0-9]+$/gi) || [];
   var decimals = template.match(/(\d+(?:\.\d*)?)/gi) || [];
-  var text = template.match(/"([^(\s+|"|(\d+))]*)"/g) || [];
+  var text = template.match(/"(.*)"/g) || [];
   var options = template.match(/\[(.*)\]/gi) || [];
   return [].concat((0, _toConsumableArray3.default)(numbers), (0, _toConsumableArray3.default)(decimals), (0, _toConsumableArray3.default)(text), (0, _toConsumableArray3.default)(options)).map(function (item, idx) {
     return `arg${idx + 1}`;
@@ -58,7 +58,9 @@ var parseScenarioTextHelper = exports.parseScenarioTextHelper = function parseSc
   var scenarioTemplate = template && template.trim();
   scenarioTemplate = scenarioTemplate.toUpperCase().startsWith(`${type.toUpperCase()} `) ? scenarioTemplate.substring(`${type} `.length, scenarioTemplate.length) : scenarioTemplate;
 
-  return scenarioTemplate.split(' ').reduce(function (prev, current) {
+  // eslint-disable-next-line no-useless-escape
+  scenarioTemplate = scenarioTemplate.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)(?=([^\[]*\[[^\[]*)*[^\]]*$)/gi, '___');
+  return scenarioTemplate.split('___').reduce(function (prev, current) {
     var acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
     if (acceptsIntegerNumbers) {
       return `${prev} (\\d+)`;
@@ -78,7 +80,7 @@ var parseScenarioTextHelper = exports.parseScenarioTextHelper = function parseSc
       return `${prev} ${formattedChoices}`;
     }
 
-    var acceptsText = /"([^(\s+|"|(\d+))]*)"/g.test(current);
+    var acceptsText = /"(.*)"/g.test(current);
     if (acceptsText) {
       return `${prev} "([^"]*)"`;
     }

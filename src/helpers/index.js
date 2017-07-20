@@ -5,9 +5,9 @@ const replaceKeyword = template => {
   }
 
   // eslint-disable-next-line no-useless-escape
-  if (/\[([a-zA-Z\|]+)]/g.test(scenarioTemplate)) {
+  if (/\[([\sa-zA-Z\|]+)]/g.test(scenarioTemplate)) {
     // eslint-disable-next-line no-useless-escape
-    scenarioTemplate = scenarioTemplate.replace(/\[([a-zA-Z\|]+)]/g, '#');
+    scenarioTemplate = scenarioTemplate.replace(/\[([\sa-zA-Z\|]+)]/g, '#');
   }
 
   return scenarioTemplate;
@@ -34,7 +34,7 @@ const replaceWhitespaces = template => {
 export const parseArgsNumberHelper = template => {
   const numbers = template.match(/^(?=[^.])[0-9]+$/gi) || [];
   const decimals = template.match(/(\d+(?:\.\d*)?)/gi) || [];
-  const text = template.match(/"([^(\s+|"|(\d+))]*)"/g) || [];
+  const text = template.match(/"(.*)"/g) || [];
   const options = template.match(/\[(.*)\]/gi) || [];
   return [...numbers, ...decimals, ...text, ...options].map((item, idx) => `arg${idx + 1}`).join(', ');
 };
@@ -45,7 +45,9 @@ export const parseScenarioTextHelper = (template, type) => {
     scenarioTemplate.substring(`${type} `.length, scenarioTemplate.length) :
     scenarioTemplate;
 
-  return scenarioTemplate.split(' ').reduce((prev, current) => {
+  // eslint-disable-next-line no-useless-escape
+  scenarioTemplate = scenarioTemplate.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)(?=([^\[]*\[[^\[]*)*[^\]]*$)/gi, '___');
+  return scenarioTemplate.split('___').reduce((prev, current) => {
     const acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
     if (acceptsIntegerNumbers) {
       return `${prev} (\\d+)`;
@@ -64,7 +66,7 @@ export const parseScenarioTextHelper = (template, type) => {
       return `${prev} ${formattedChoices}`;
     }
 
-    const acceptsText = /"([^(\s+|"|(\d+))]*)"/g.test(current);
+    const acceptsText = /"(.*)"/g.test(current);
     if (acceptsText) {
       return `${prev} "([^"]*)"`;
     }
