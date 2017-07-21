@@ -49,13 +49,8 @@ var parseArgsNumberHelper = exports.parseArgsNumberHelper = function parseArgsNu
   // eslint-disable-next-line no-useless-escape
   scenarioTemplate = scenarioTemplate.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)(?=([^\[]*\[[^\[]*)*[^\]]*$)/gi, '___');
   var numberOfArgs = scenarioTemplate.split('___').reduce(function (prev, current) {
-    var acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
-    if (acceptsIntegerNumbers) {
-      return prev + 1;
-    }
-
-    var acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
-    if (acceptsDecimalNumbers) {
+    var acceptsText = /"(.*)"/g.test(current);
+    if (acceptsText) {
       return prev + 1;
     }
 
@@ -64,8 +59,13 @@ var parseArgsNumberHelper = exports.parseArgsNumberHelper = function parseArgsNu
       return prev + 1;
     }
 
-    var acceptsText = /"(.*)"/g.test(current);
-    if (acceptsText) {
+    var acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
+    if (acceptsIntegerNumbers) {
+      return prev + 1;
+    }
+
+    var acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
+    if (acceptsDecimalNumbers) {
       return prev + 1;
     }
 
@@ -89,14 +89,9 @@ var parseScenarioTextHelper = exports.parseScenarioTextHelper = function parseSc
   // eslint-disable-next-line no-useless-escape
   scenarioTemplate = scenarioTemplate.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)(?=([^\[]*\[[^\[]*)*[^\]]*$)/gi, '___');
   return scenarioTemplate.split('___').reduce(function (prev, current) {
-    var acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
-    if (acceptsIntegerNumbers) {
-      return `${prev} (\\d+)`;
-    }
-
-    var acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
-    if (acceptsDecimalNumbers) {
-      return `${prev} (\\d+(?:\\.\\d*)?)`;
+    var acceptsText = /"(.*)"/g.test(current);
+    if (acceptsText) {
+      return `${prev} "([^"]*)"`;
     }
 
     var acceptMultipleChoices = /\[(.*)\]/gi.test(current);
@@ -108,9 +103,14 @@ var parseScenarioTextHelper = exports.parseScenarioTextHelper = function parseSc
       return `${prev} ${formattedChoices}`;
     }
 
-    var acceptsText = /"(.*)"/g.test(current);
-    if (acceptsText) {
-      return `${prev} "([^"]*)"`;
+    var acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
+    if (acceptsIntegerNumbers) {
+      return `${prev} (\\d+)`;
+    }
+
+    var acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
+    if (acceptsDecimalNumbers) {
+      return `${prev} (\\d+(?:\\.\\d*)?)`;
     }
 
     return `${prev} ${current}`;

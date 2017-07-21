@@ -36,13 +36,8 @@ export const parseArgsNumberHelper = (template, addDoneCallback) => {
   // eslint-disable-next-line no-useless-escape
   scenarioTemplate = scenarioTemplate.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)(?=([^\[]*\[[^\[]*)*[^\]]*$)/gi, '___');
   const numberOfArgs = scenarioTemplate.split('___').reduce((prev, current) => {
-    const acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
-    if (acceptsIntegerNumbers) {
-      return prev + 1;
-    }
-
-    const acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
-    if (acceptsDecimalNumbers) {
+    const acceptsText = /"(.*)"/g.test(current);
+    if (acceptsText) {
       return prev + 1;
     }
 
@@ -51,8 +46,13 @@ export const parseArgsNumberHelper = (template, addDoneCallback) => {
       return prev + 1;
     }
 
-    const acceptsText = /"(.*)"/g.test(current);
-    if (acceptsText) {
+    const acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
+    if (acceptsIntegerNumbers) {
+      return prev + 1;
+    }
+
+    const acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
+    if (acceptsDecimalNumbers) {
       return prev + 1;
     }
 
@@ -76,14 +76,9 @@ export const parseScenarioTextHelper = (template, type) => {
   // eslint-disable-next-line no-useless-escape
   scenarioTemplate = scenarioTemplate.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)(?=([^\[]*\[[^\[]*)*[^\]]*$)/gi, '___');
   return scenarioTemplate.split('___').reduce((prev, current) => {
-    const acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
-    if (acceptsIntegerNumbers) {
-      return `${prev} (\\d+)`;
-    }
-
-    const acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
-    if (acceptsDecimalNumbers) {
-      return `${prev} (\\d+(?:\\.\\d*)?)`;
+    const acceptsText = /"(.*)"/g.test(current);
+    if (acceptsText) {
+      return `${prev} "([^"]*)"`;
     }
 
     const acceptMultipleChoices = /\[(.*)\]/gi.test(current);
@@ -94,9 +89,14 @@ export const parseScenarioTextHelper = (template, type) => {
       return `${prev} ${formattedChoices}`;
     }
 
-    const acceptsText = /"(.*)"/g.test(current);
-    if (acceptsText) {
-      return `${prev} "([^"]*)"`;
+    const acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
+    if (acceptsIntegerNumbers) {
+      return `${prev} (\\d+)`;
+    }
+
+    const acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
+    if (acceptsDecimalNumbers) {
+      return `${prev} (\\d+(?:\\.\\d*)?)`;
     }
 
     return `${prev} ${current}`;
