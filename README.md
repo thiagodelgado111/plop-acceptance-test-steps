@@ -1,6 +1,8 @@
 # ✨ plop - acceptance test steps
 A generator to create step definitions for automated acceptance tests.
 
+![acceptance test steps generator](misc/plop.png "Acceptance test steps generator")
+
 ## Usage
 1. Install plop globally:
 
