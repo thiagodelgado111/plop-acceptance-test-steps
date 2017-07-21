@@ -29,7 +29,7 @@ A generator to create step definitions for automated acceptance tests.
 ```
 
 ## Contributing
-To contribute, please open an issue or file a PR 😃
+To contribute, please open an issue or file a PR 💪
 
 ## License
 MIT
