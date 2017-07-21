@@ -24,9 +24,14 @@ exports.default = function (plop) {
       choices: ['Given', 'When', 'Then'],
       message: 'Which kind of step do you need?'
     }, {
+      type: 'confirm',
+      name: 'addDoneCallback',
+      message: 'Does your test needs to call a callback to tell it is done?',
+      default: false
+    }, {
       type: 'input',
       name: 'stepName',
-      message: 'Please type in the step definition:'
+      message: 'Please type in the step definition (you can omit the step type):'
     }],
     actions: [{
       type: 'add',

@@ -5,9 +5,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.parseScenarioFilenameHelper = exports.parseScenarioTextHelper = exports.parseArgsNumberHelper = undefined;
 
-var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+var _from = require('babel-runtime/core-js/array/from');
 
-var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+var _from2 = _interopRequireDefault(_from);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -44,14 +44,42 @@ var replaceWhitespaces = function replaceWhitespaces(template) {
   return scenarioTemplate;
 };
 
-var parseArgsNumberHelper = exports.parseArgsNumberHelper = function parseArgsNumberHelper(template) {
-  var numbers = template.match(/^(?=[^.])[0-9]+$/gi) || [];
-  var decimals = template.match(/(\d+(?:\.\d*)?)/gi) || [];
-  var text = template.match(/"(.*)"/g) || [];
-  var options = template.match(/\[(.*)\]/gi) || [];
-  return [].concat((0, _toConsumableArray3.default)(numbers), (0, _toConsumableArray3.default)(decimals), (0, _toConsumableArray3.default)(text), (0, _toConsumableArray3.default)(options)).map(function (item, idx) {
+var parseArgsNumberHelper = exports.parseArgsNumberHelper = function parseArgsNumberHelper(template, addDoneCallback) {
+  var scenarioTemplate = template && template.trim();
+  // eslint-disable-next-line no-useless-escape
+  scenarioTemplate = scenarioTemplate.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)(?=([^\[]*\[[^\[]*)*[^\]]*$)/gi, '___');
+  var numberOfArgs = scenarioTemplate.split('___').reduce(function (prev, current) {
+    var acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
+    if (acceptsIntegerNumbers) {
+      return prev + 1;
+    }
+
+    var acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
+    if (acceptsDecimalNumbers) {
+      return prev + 1;
+    }
+
+    var acceptMultipleChoices = /\[(.*)\]/gi.test(current);
+    if (acceptMultipleChoices) {
+      return prev + 1;
+    }
+
+    var acceptsText = /"(.*)"/g.test(current);
+    if (acceptsText) {
+      return prev + 1;
+    }
+
+    return prev;
+  }, 0);
+
+  var args = (0, _from2.default)(Array(numberOfArgs)).map(function (item, idx) {
     return `arg${idx + 1}`;
   }).join(', ');
+  if (addDoneCallback) {
+    args += ', done';
+  }
+
+  return args;
 };
 
 var parseScenarioTextHelper = exports.parseScenarioTextHelper = function parseScenarioTextHelper(template, type) {

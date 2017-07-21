@@ -31,12 +31,40 @@ const replaceWhitespaces = template => {
   return scenarioTemplate;
 };
 
-export const parseArgsNumberHelper = template => {
-  const numbers = template.match(/^(?=[^.])[0-9]+$/gi) || [];
-  const decimals = template.match(/(\d+(?:\.\d*)?)/gi) || [];
-  const text = template.match(/"(.*)"/g) || [];
-  const options = template.match(/\[(.*)\]/gi) || [];
-  return [...numbers, ...decimals, ...text, ...options].map((item, idx) => `arg${idx + 1}`).join(', ');
+export const parseArgsNumberHelper = (template, addDoneCallback) => {
+  let scenarioTemplate = template && template.trim();
+  // eslint-disable-next-line no-useless-escape
+  scenarioTemplate = scenarioTemplate.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)(?=([^\[]*\[[^\[]*)*[^\]]*$)/gi, '___');
+  const numberOfArgs = scenarioTemplate.split('___').reduce((prev, current) => {
+    const acceptsIntegerNumbers = /^(?=[^.])[0-9]+$/.test(current);
+    if (acceptsIntegerNumbers) {
+      return prev + 1;
+    }
+
+    const acceptsDecimalNumbers = /(\d+(?:\.\d*)?)/.test(current);
+    if (acceptsDecimalNumbers) {
+      return prev + 1;
+    }
+
+    const acceptMultipleChoices = /\[(.*)\]/gi.test(current);
+    if (acceptMultipleChoices) {
+      return prev + 1;
+    }
+
+    const acceptsText = /"(.*)"/g.test(current);
+    if (acceptsText) {
+      return prev + 1;
+    }
+
+    return prev;
+  }, 0);
+
+  let args = Array.from(Array(numberOfArgs)).map((item, idx) => `arg${idx + 1}`).join(', ');
+  if (addDoneCallback) {
+    args += ', done';
+  }
+
+  return args;
 };
 
 export const parseScenarioTextHelper = (template, type) => {
