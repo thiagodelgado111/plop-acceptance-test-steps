@@ -10,10 +10,22 @@ A generator to create step definitions for automated acceptance tests.
 
 `yarn add --dev plop-acceptance-test-steps` or `npm install --save-dev plop-acceptance-test-steps`
 
-3. Create a `plopfile.js` in the root folder of your project, with the following content:
+3. Create a `plopfile.js` in the root folder of your project, and require `plop-acceptance-test-steps`:
 
 ```javascript
   module.exports = require('plop-acceptance-test-steps');
+```
+
+or
+
+```javascript
+  const acceptanceTestsGenerator = require('plop-acceptance-test-steps');
+  
+  module.exports = function (plop) {
+    ...
+    acceptanceTestsGenerator(plop);
+    ...
+  };
 ```
 
 ## Contributing
