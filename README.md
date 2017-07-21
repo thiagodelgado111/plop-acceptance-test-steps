@@ -16,7 +16,7 @@ A generator to create step definitions for automated acceptance tests.
   module.exports = require('plop-acceptance-test-steps');
 ```
 
-or
+  or
 
 ```javascript
   const acceptanceTestsGenerator = require('plop-acceptance-test-steps');
