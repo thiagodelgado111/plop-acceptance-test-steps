@@ -1,4 +1,4 @@
-# plop - acceptance test steps
+# plop - acceptance test steps  ✨
 A generator to create step definitions for automated acceptance tests.
 
 ## Usage
@@ -29,7 +29,7 @@ A generator to create step definitions for automated acceptance tests.
 ```
 
 ## Contributing
-To contribute, please open an issue or directly file a PR :)
+To contribute, please open an issue or file a PR 😃
 
 ## License
 MIT
